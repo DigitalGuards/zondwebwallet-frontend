@@ -7,6 +7,20 @@ import commonjs from '@rollup/plugin-commonjs'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    proxy: {
+      '/zond-rpc/testnet': {
+        target: 'http://209.250.255.226:8545',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/zond-rpc\/testnet/, ''),
+      },
+      '/zond-rpc/local': {
+        target: 'http://localhost:8545',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/zond-rpc\/local/, ''),
+      }
+    }
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

@@ -1,13 +1,24 @@
+const getBaseUrl = () => {
+  if (import.meta.env.DEV) {
+    return 'http://localhost:5173';  // Development server URL
+  }
+  return window.location.origin;  // Production URL
+};
+
 export const ZOND_PROVIDER = {
-  DEV: { id: "DEV", url: "http://localhost:8545", name: "Zond Local Node" },
+  DEV: { 
+    id: "DEV", 
+    url: `${getBaseUrl()}/zond-rpc/local`,
+    name: "Zond Local Node" 
+  },
   TEST_NET: {
     id: "TEST_NET",
-    url: "http://209.250.255.226:8545",
+    url: `${getBaseUrl()}/zond-rpc/testnet`,
     name: "Zond Testnet",
   },
   MAIN_NET: {
     id: "MAIN_NET",
-    url: "https://mainnet.zond.com",
+    url: "http://mainnet.zond.com",
     name: "Zond Mainnet",
   },
 };
