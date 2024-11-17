@@ -2,17 +2,35 @@ import { useStore } from "../../../../../stores/store";
 import { cva } from "class-variance-authority";
 import { observer } from "mobx-react-lite";
 
-const backgroundVideoClasses = cva("fixed z-0 overflow-hidden", {
-  variants: {
-    isDarkMode: {
-      true: ["top-0 -left-24 scale-150"],
-      false: ["-top-44 -left-4"],
+const backgroundVideoClasses = cva(
+  "fixed inset-0 w-screen h-screen object-cover z-0 opacity-35",
+  {
+    variants: {
+      isDarkMode: {
+        true: [],
+        false: [],
+      },
     },
-  },
-  defaultVariants: {
-    isDarkMode: false,
-  },
-});
+    defaultVariants: {
+      isDarkMode: false,
+    },
+  }
+);
+
+const videoContainerClasses = cva(
+  "fixed inset-0 w-full h-full overflow-hidden", 
+  {
+    variants: {
+      isDarkMode: {
+        true: ["after:content-[''] after:absolute after:inset-0 after:bg-black/20"],
+        false: [],
+      },
+    },
+    defaultVariants: {
+      isDarkMode: false,
+    },
+  }
+);
 
 const BackgroundVideo = observer(() => {
   const { settingsStore } = useStore();
@@ -21,14 +39,19 @@ const BackgroundVideo = observer(() => {
   const backgroundVideoSource = `/qrl-video-${theme}.mp4`;
 
   return (
-    <video
-      autoPlay
-      muted
-      loop
-      className={backgroundVideoClasses({ isDarkMode })}
-    >
-      <source src={backgroundVideoSource} type="video/mp4" />
-    </video>
+    <div className={videoContainerClasses({ isDarkMode })}>
+      <video
+        autoPlay
+        muted
+        loop
+        style={{ 
+          objectPosition: '5% 35%'
+        }}
+        className={backgroundVideoClasses({ isDarkMode })}
+      >
+        <source src={backgroundVideoSource} type="video/mp4" />
+      </video>
+    </div>
   );
 });
 

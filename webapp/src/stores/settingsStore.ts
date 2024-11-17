@@ -11,8 +11,9 @@ class SettingsStore {
 
   constructor() {
     makeAutoObservable(this, { isDarkMode: observable, theme: observable });
-    this.isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    this.theme = this.isDarkMode ? THEME.DARK : THEME.LIGHT;
+    // Always default to dark mode
+    this.isDarkMode = true;
+    this.theme = THEME.DARK;
     document?.documentElement?.classList?.add(this.theme);
   }
 }
