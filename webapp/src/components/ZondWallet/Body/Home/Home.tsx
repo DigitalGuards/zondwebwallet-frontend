@@ -1,6 +1,6 @@
 import withSuspense from "../../../../functions/withSuspense";
 import { useStore } from "../../../../stores/store";
-import { Loader } from "lucide-react";
+import { Loader, Github, Twitter } from "lucide-react";
 import { observer } from "mobx-react-lite";
 import { lazy } from "react";
 import ConnectionFailed from "./ConnectionFailed/ConnectionFailed";
@@ -33,6 +33,30 @@ const Home = observer(() => {
             {isConnected ? <AccountCreateImport /> : <ConnectionFailed />}
           </>
         )}
+        
+        {/* Social Links */}
+        <div className="fixed bottom-4 flex gap-4 text-foreground/60 hover:text-foreground/80">
+          <a
+            href="https://github.com/DigitalGuards/zondwebwallet/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 transition-colors duration-200"
+            aria-label="GitHub Repository"
+          >
+            <Github size={20} />
+            <span className="text-sm">GitHub</span>
+          </a>
+          <a
+            href="https://x.com/DigitalGuards"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 transition-colors duration-200"
+            aria-label="Twitter Profile"
+          >
+            <Twitter size={20} />
+            <span className="text-sm">Twitter</span>
+          </a>
+        </div>
       </div>
     </>
   );
