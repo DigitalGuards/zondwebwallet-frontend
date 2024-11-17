@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 
 // Lazy load components
@@ -67,15 +67,11 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
+      {
+        path: ROUTES.DEFAULT,
+        element: <Navigate to={ROUTES.HOME} replace />
+      },
     ],
-  },
-  {
-    path: ROUTES.DEFAULT,
-    element: (
-      <Suspense fallback={<div>Loading...</div>}>
-        <ZondWallet />
-      </Suspense>
-    ),
   },
 ]);
 
