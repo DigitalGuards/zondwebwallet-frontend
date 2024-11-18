@@ -15,7 +15,7 @@ app.use(cors({
 // RPC endpoints configuration
 const RPC_ENDPOINTS = {
   dev: 'http://localhost:8545',
-  testnet: 'http://209.250.255.226:8545',
+  testnet: 'http://95.170.68.91:8545',
   mainnet: 'http://mainnet.zond.network:8545'
 };
 
