@@ -1,7 +1,9 @@
 # QRL Merchant Payment System Implementation
 
 ## Overview
-This document tracks the implementation progress of the QRL merchant payment system. The system allows vendors to accept QRL payments through generated payment links with QR codes, payment details, and expiration timers.
+This document tracks the implementation progress of the QRL merchant payment system. The system allows vendors to accept native QRL payments through generated payment links with QR codes, payment details, and expiration timers.
+
+**Note**: Token payment support will be added in a future phase to keep the initial implementation simple and focused.
 
 ## Progress Tracking
 
@@ -50,7 +52,6 @@ This document tracks the implementation progress of the QRL merchant payment sys
 - [ ] Implement payment filtering/search
 - [ ] Add export functionality (CSV/PDF)
 - [ ] Create merchant analytics dashboard
-- [ ] Add multi-token support UI
 - [ ] Implement partial payment handling
 
 #### Backend Tasks
@@ -70,6 +71,13 @@ This document tracks the implementation progress of the QRL merchant payment sys
 - [ ] Create example integrations
 - [ ] Add payment button generator
 
+### Future Enhancements (Post-MVP) 🔮
+
+- [ ] Add multi-token support (ERC20 tokens)
+- [ ] Implement token selection in payment forms
+- [ ] Add token price conversion features
+- [ ] Support for stablecoin payments
+
 ## Implementation Details
 
 ### Frontend Structure
@@ -78,7 +86,7 @@ src/components/ZondWallet/Body/Merchant/
 ├── MerchantDashboard.tsx       # Main merchant dashboard
 ├── CreatePayment/
 │   ├── CreatePayment.tsx       # Payment creation form
-│   └── PaymentForm.tsx         # Form with amount, description, expiry
+│   └── PaymentForm.tsx         # Form with amount (QRL only), description, expiry
 ├── PaymentHistory/
 │   └── PaymentHistory.tsx      # List of created payments
 └── PaymentPage/
@@ -100,8 +108,7 @@ src/components/ZondWallet/Body/Merchant/
 interface PaymentRequest {
   id: string;                    // UUID
   merchantAddress: string;       // Merchant's QRL address
-  amount: string;               // Amount in QRL
-  tokenAddress?: string;        // Optional token contract address
+  amount: string;               // Amount in QRL (native currency only)
   description: string;          // Payment description
   status: PaymentStatus;        // pending | partial | confirmed | expired
   createdAt: Date;             // Creation timestamp
@@ -156,6 +163,7 @@ enum PaymentStatus {
 ### Recent Updates
 - Created implementation plan and tracking document
 - Set up feature branch for development
+- Simplified plan to focus on native QRL payments only (token support deferred)
 
 ### Next Steps
 1. Set up basic merchant routes in frontend
