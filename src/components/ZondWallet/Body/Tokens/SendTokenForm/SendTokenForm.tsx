@@ -40,8 +40,9 @@ const FormSchema = z
                 const num = Number(val);
                 return !isNaN(num) && num > 0;
             }, { message: "Amount must be a positive number" })
-            .transform((val) => Number(val))
     });
+
+type FormInput = z.input<typeof FormSchema>;
 
 type TokenSendingFormProps = {
     onTokenSent: (tokenAddress: string, toAddress: string, amount: number) => void;
@@ -50,13 +51,14 @@ type TokenSendingFormProps = {
 export const TokenSendingForm = observer(
     ({ onTokenSent }: TokenSendingFormProps) => {
 
-        const form = useForm({
+        const form = useForm<FormInput>({
             resolver: zodResolver(FormSchema),
             mode: "onChange",
             reValidateMode: "onSubmit",
             defaultValues: {
                 tokenAddress: "",
                 toAddress: "",
+                amount: "",
             },
         });
         const {
@@ -65,11 +67,11 @@ export const TokenSendingForm = observer(
             formState: { isSubmitting, isValid },
         } = form;
 
-        async function onSubmit(formData: z.output<typeof FormSchema>) {
+        async function onSubmit(formData: FormInput) {
             try {
                 const tokenAddress = formData.tokenAddress;
                 const toAddress = formData.toAddress;
-                const amount = formData.amount;
+                const amount = Number(formData.amount);
                 onTokenSent(tokenAddress, toAddress, amount);
             } catch (_error) {
                 // control.setError("reEnteredPassword", {
@@ -87,7 +89,7 @@ export const TokenSendingForm = observer(
                         </CardHeader>
                         <CardContent className="space-y-8">
                             <FormField
-                                control={control as any}
+                                control={control}
                                 name="tokenAddress"
                                 render={({ field }) => (
                                     <FormItem>
@@ -105,7 +107,7 @@ export const TokenSendingForm = observer(
                                 )}
                             />
                             <FormField
-                                control={control as any}
+                                control={control}
                                 name="toAddress"
                                 render={({ field }) => (
                                     <FormItem>
@@ -123,7 +125,7 @@ export const TokenSendingForm = observer(
                                 )}
                             />
                             <FormField
-                                control={control as any}
+                                control={control}
                                 name="amount"
                                 render={({ field }) => (
                                     <FormItem>
