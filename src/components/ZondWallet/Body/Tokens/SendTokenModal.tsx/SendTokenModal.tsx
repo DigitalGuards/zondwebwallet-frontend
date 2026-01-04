@@ -11,18 +11,18 @@ import { Input } from "@/components/UI/Input"
 import { Label } from "@/components/UI/Label"
 import { useEffect, useState } from "react";
 import { useStore } from "@/stores/store";
-import { TokenInterface } from "@/lib/constants";
+import { TokenInterface } from "@/constants/tokens";
 import { toast } from "@/hooks/use-toast";
-import { fetchBalance, fetchTokenInfo } from "@/utilities/web3utils/customERC20";
+import { fetchBalance, fetchTokenInfo } from "@/utils/web3/customERC20";
 import { Loader2 } from "lucide-react";
-import { getAddressFromMnemonic } from "@/functions/getHexSeedFromMnemonic";
-import StorageUtil from "@/utilities/storageUtil";
-import { ZOND_PROVIDER } from "@/configuration/zondConfig";
+import { getAddressFromMnemonic } from "@/utils/crypto/mnemonic";
+import StorageUtil from "@/utils/storage/storage";
+import { ZOND_PROVIDER } from "@/config/networks";
 import { formatUnits, parseUnits } from "ethers";
 import { Slider } from "@/components/UI/Slider";
 import { PinInput } from "@/components/UI/PinInput/PinInput";
-import { WalletEncryptionUtil } from "@/utilities/walletEncryptionUtil";
-import { isValidZondAddress } from "@/utilities/addressValidation";
+import { WalletEncryptionUtil } from "@/utils/crypto/walletEncryption";
+import { isValidZondAddress } from "@/utils/web3/address";
 
 export function SendTokenModal({ isOpen, onClose, token }: { isOpen: boolean, onClose: () => void, token: TokenInterface }) {
     const { zondStore } = useStore();

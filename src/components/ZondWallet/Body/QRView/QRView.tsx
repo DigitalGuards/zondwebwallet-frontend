@@ -1,4 +1,4 @@
-import { getExplorerAddressUrl } from "@/configuration/zondConfig";
+import { getExplorerAddressUrl } from "@/config/networks";
 import { observer } from "mobx-react-lite";
 import { QRCodeSVG } from "qrcode.react";
 import { Label } from "@/components/UI/Label";

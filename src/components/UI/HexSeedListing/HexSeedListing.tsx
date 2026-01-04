@@ -1,4 +1,4 @@
-import StringUtil from "@/utilities/stringUtil";
+import StringUtil from "@/utils/formatting/string";
 import { cva } from "class-variance-authority";
 
 type HexSeedListingProps = {

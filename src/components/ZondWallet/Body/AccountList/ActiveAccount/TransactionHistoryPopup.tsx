@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import axios from "axios";
-import { SERVER_URL } from "@/configuration/zondConfig";
-import { formatBalance } from "@/utilities/helper";
+import { SERVER_URL } from "@/config/networks";
+import { formatBalance } from "@/utils/formatting/balance";
 import { Card, CardContent } from "../../../../UI/Card";
 import { Button } from "../../../../UI/Button";
-import { getExplorerAddressUrl } from "../../../../../configuration/zondConfig";
+import { getExplorerAddressUrl } from "@/config/networks";
 
 type TransactionHistoryType = {
     ID: string;
