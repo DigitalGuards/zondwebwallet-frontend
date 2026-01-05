@@ -1,6 +1,6 @@
 import { useStore } from "../../../../../stores/store";
 import { observer } from "mobx-react-lite";
-import { formatBalance } from "@/utils/formatting/balance";
+import { formatBalance } from "@/utils/formatting";
 import { cn } from "@/utils/cn";
 
 type AccountBalanceProps = {

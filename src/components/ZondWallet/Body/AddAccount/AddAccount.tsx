@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { lazy } from "react";
-import withSuspense from "@/utils/react/withSuspense";
+import { withSuspense } from "@/utils/react";
 
 const AccountCreateImport = withSuspense(
     lazy(() => import("../Home/AccountCreateImport/AccountCreateImport"))

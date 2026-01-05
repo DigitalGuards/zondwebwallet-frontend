@@ -17,12 +17,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../../../../UI/Dialog";
-import { getMnemonicFromHexSeed } from "@/utils/crypto/mnemonic";
-import withSuspense from "@/utils/react/withSuspense";
+import { getMnemonicFromHexSeed } from "@/utils/crypto";
+import { withSuspense } from "@/utils/react";
 import { Web3BaseWalletAccount } from "@theqrl/web3";
 import { ArrowRight, Copy, HardDriveDownload, Undo } from "lucide-react";
 import { lazy, useState } from "react";
-import { WalletEncryptionUtil } from "@/utils/crypto/walletEncryption";
+import { WalletEncryptionUtil } from "@/utils/crypto";
 import { HexSeedListing } from "@/components/UI/HexSeedListing/HexSeedListing";
 
 const MnemonicWordListing = withSuspense(

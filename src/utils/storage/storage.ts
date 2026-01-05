@@ -1,5 +1,5 @@
-import { ZOND_PROVIDER } from "@/config/networks";
-import { TokenInterface } from "@/constants/tokens";
+import { ZOND_PROVIDER } from "@/config";
+import { TokenInterface } from "@/constants";
 
 const ACTIVE_PAGE_IDENTIFIER = "ACTIVE_PAGE";
 const BLOCKCHAIN_SELECTION_IDENTIFIER = "BLOCKCHAIN_SELECTION";

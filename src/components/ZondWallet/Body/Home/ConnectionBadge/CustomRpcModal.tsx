@@ -10,9 +10,9 @@ import {
 import { Input } from "@/components/UI/Input"
 import { Label } from "@/components/UI/Label"
 import { useEffect, useState } from "react";
-import { ZOND_PROVIDER } from "@/config/networks";
+import { ZOND_PROVIDER } from "@/config";
 import { useStore } from "@/stores/store";
-import StorageUtil from "@/utils/storage/storage";
+import { StorageUtil } from "@/utils/storage";
 
 export function CustomRpcModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
     const { CUSTOM_RPC } = ZOND_PROVIDER;

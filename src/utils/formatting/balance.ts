@@ -1,4 +1,4 @@
-import { NATIVE_TOKEN } from "@/constants/tokens";
+import { NATIVE_TOKEN } from "@/constants";
 import { BigNumber } from "bignumber.js";
 
 BigNumber.config({

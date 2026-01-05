@@ -1,7 +1,7 @@
-import { ZOND_PROVIDER, getPendingTxApiUrl } from "@/config/networks";
-import { getHexSeedFromMnemonic } from "@/utils/crypto/mnemonic";
-import StorageUtil, { AccountListItem, AccountSource } from "@/utils/storage/storage";
-import log from "@/utils/log";
+import { ZOND_PROVIDER, getPendingTxApiUrl } from "@/config";
+import { getHexSeedFromMnemonic } from "@/utils/crypto";
+import { StorageUtil, AccountListItem, AccountSource } from "@/utils/storage";
+import { log } from "@/utils";
 import Web3, {
   TransactionReceipt,
   Web3ZondInterface,
@@ -9,11 +9,11 @@ import Web3, {
 } from "@theqrl/web3";
 import { action, computed, makeAutoObservable, observable, runInAction } from "mobx";
 import { customERC20FactoryABI } from "@/abi/CustomERC20FactoryABI";
-import { fetchTokenInfo, fetchBalance } from "@/utils/web3/customERC20";
-import { TokenInterface, KNOWN_TOKEN_LIST } from "@/constants/tokens";
+import { fetchTokenInfo, fetchBalance } from "@/utils/web3";
+import { TokenInterface, KNOWN_TOKEN_LIST } from "@/constants";
 import CustomERC20ABI from "@/abi/CustomERC20ABI";
 import { formatUnits } from "ethers";
-import { getOptimalTokenBalance } from "@/utils/formatting/balance";
+import { getOptimalTokenBalance } from "@/utils/formatting";
 
 type ActiveAccountType = {
   accountAddress: string;

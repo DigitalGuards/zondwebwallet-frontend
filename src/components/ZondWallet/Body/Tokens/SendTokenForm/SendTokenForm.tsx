@@ -20,7 +20,7 @@ import { Loader } from "lucide-react";
 import { observer } from "mobx-react-lite";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { isValidZondAddress } from "@/utils/web3/address";
+import { isValidZondAddress } from "@/utils/web3";
 
 const FormSchema = z
     .object({

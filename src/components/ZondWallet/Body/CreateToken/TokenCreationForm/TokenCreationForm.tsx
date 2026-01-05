@@ -29,11 +29,11 @@ import { ethers } from "ethers";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/router/router";
 import { PinInput } from "@/components/UI/PinInput/PinInput";
-import { WalletEncryptionUtil } from "@/utils/crypto/walletEncryption";
-import StorageUtil from "@/utils/storage/storage";
-import { getAddressFromMnemonic } from "@/utils/crypto/mnemonic";
+import { WalletEncryptionUtil } from "@/utils/crypto";
+import { StorageUtil } from "@/utils/storage";
+import { getAddressFromMnemonic } from "@/utils/crypto";
 import { Label } from "@/components/UI/Label";
-import { isValidZondAddress } from "@/utils/web3/address";
+import { isValidZondAddress } from "@/utils/web3";
 
 const FormSchema = z
     .object({

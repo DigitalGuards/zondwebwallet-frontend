@@ -20,7 +20,7 @@ import { Label } from "@/components/UI/Label";
 import { Separator } from "@/components/UI/Separator";
 import { ROUTES } from "@/router/router";
 import { useStore } from "@/stores/store";
-import StorageUtil from "@/utils/storage/storage";
+import { StorageUtil } from "@/utils/storage";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { utils } from "@theqrl/web3";
 import { Loader, Send, X, Check, Copy } from "lucide-react";
@@ -31,14 +31,14 @@ import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { GasFeeNotice } from "./GasFeeNotice/GasFeeNotice";
 import { TransactionSuccessful } from "./TransactionSuccessful/TransactionSuccessful";
-import { getExplorerAddressUrl, getExplorerTxUrl } from "@/config/networks";
+import { getExplorerAddressUrl, getExplorerTxUrl } from "@/config";
 import { ExternalLink } from "lucide-react";
 
 import { Slider } from "@/components/UI/Slider";
 import { PinInput } from "@/components/UI/PinInput/PinInput";
-import { WalletEncryptionUtil } from "@/utils/crypto/walletEncryption";
+import { WalletEncryptionUtil } from "@/utils/crypto";
 import { SEO } from "@/components/SEO/SEO";
-import { getOptimalTokenBalance } from "@/utils/formatting/balance";
+import { getOptimalTokenBalance } from "@/utils/formatting";
 
 const FormSchema = z
   .object({

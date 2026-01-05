@@ -1,6 +1,6 @@
 import { ROUTES } from "@/router/router";
 import StorageUtil from "./storage/storage";
-import { ZOND_PROVIDER } from "@/config/networks";
+import { ZOND_PROVIDER } from "@/config";
 
 /**
  * A utility function to handle logout by clearing
