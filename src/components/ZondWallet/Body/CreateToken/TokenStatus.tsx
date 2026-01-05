@@ -134,7 +134,7 @@ const TokenStatus = observer(() => {
                                 <span className="text-sm text-muted-foreground">Transaction Hash</span>
                                 <div className="flex items-center gap-2">
                                     <a
-                                        href={`${explorerUrl}/pending/tx/${tx}`}
+                                        href={`${explorerUrl}/tx/${tx}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="flex items-center gap-2 font-medium text-secondary hover:text-secondary/80"

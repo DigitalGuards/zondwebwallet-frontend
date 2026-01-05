@@ -193,7 +193,7 @@ export const TokenCreationForm = observer(
                 onTokenCreated(tokenName, tokenSymbol, initialSupply, decimals, maxSupply, recipientAddress, ownerAddress, maxWalletAmount, maxTransactionLimit, mnemonicPhrase)
                     .catch((error) => {
                         console.error("Token creation failed:", error);
-                        // Error handling is done in createToken via setCreatingToken("", false)
+                        // The error state is set within zondStore and displayed on the status page
                     });
             } catch (error) {
                 console.error("Error creating token:", error);
