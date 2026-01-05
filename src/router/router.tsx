@@ -20,6 +20,7 @@ const Privacy = lazy(() => import("../components/ZondWallet/Body/Privacy/Privacy
 const Support = lazy(() => import("../components/ZondWallet/Body/Support/Support.tsx"));
 const TokenStatus = lazy(() => import("../components/ZondWallet/Body/CreateToken/TokenStatus.tsx"));
 const TransactionHistory = lazy(() => import("../components/ZondWallet/Body/TransactionHistory/TransactionHistory.tsx"));
+const Transfer = lazy(() => import("../components/ZondWallet/Body/Transfer/Transfer.tsx"));
 
 const ROUTES = {
   HOME: "/",
@@ -30,8 +31,7 @@ const ROUTES = {
   ACCOUNT_DETAILS: "/account-details",
   CREATE_TOKEN: "/create-token",
   QR_VIEW: "/qr-view",
-  SEND: "/send",
-  // TOKENS: "/tokens",
+  TRANSFER: "/transfer",
   SETTINGS: "/settings",
   TERMS: "/terms",
   PRIVACY: "/privacy",
@@ -159,6 +159,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<Loading />}>
             <TransactionHistory />
+          </Suspense>
+        )
+      },
+      {
+        path: ROUTES.TRANSFER,
+        element: (
+          <Suspense fallback={<Loading />}>
+            <Transfer />
           </Suspense>
         )
       },
