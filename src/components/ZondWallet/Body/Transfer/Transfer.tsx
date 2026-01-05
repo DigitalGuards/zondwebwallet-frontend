@@ -30,16 +30,15 @@ import { useStore } from "@/stores/store";
 import { StorageUtil } from "@/utils/storage";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { utils } from "@theqrl/web3";
-import { Loader, Send, X, Copy, Coins } from "lucide-react";
+import { Loader, Send, X, Copy, Coins, ExternalLink } from "lucide-react";
 import { observer } from "mobx-react-lite";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { GasFeeNotice } from "./GasFeeNotice/GasFeeNotice";
 import { TransactionSuccessful } from "./TransactionSuccessful/TransactionSuccessful";
 import { getExplorerAddressUrl, getExplorerTxUrl, ZOND_PROVIDER } from "@/config";
-import { ExternalLink } from "lucide-react";
 import { Slider } from "@/components/UI/Slider";
 import { PinInput } from "@/components/UI/PinInput/PinInput";
 import { WalletEncryptionUtil, getAddressFromMnemonic } from "@/utils/crypto";
@@ -47,28 +46,6 @@ import { SEO } from "@/components/SEO/SEO";
 import { getOptimalTokenBalance } from "@/utils/formatting";
 import { fetchBalance } from "@/utils/web3";
 import { formatUnits, parseUnits } from "ethers";
-import { toast } from "@/hooks/use-toast";
-
-const FormSchema = z
-  .object({
-    asset: z.string().min(1, "Please select an asset"),
-    receiverAddress: z.string().min(1, "Receiver address is required"),
-    amount: z.coerce.number().gt(0, "Amount should be more than 0"),
-    pin: z.string().optional(),
-  })
-  .superRefine((fields, ctx) => {
-    if (!fields.receiverAddress.trim()) return;
-    const address = fields.receiverAddress.trim();
-    const isValidZondAddress = address.startsWith('Z') &&
-      (address.length === 41 || address.length === 42);
-    if (!isValidZondAddress) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Invalid Zond address format",
-        path: ["receiverAddress"]
-      });
-    }
-  });
 
 const Transfer = observer(() => {
   const navigate = useNavigate();
@@ -89,6 +66,43 @@ const Transfer = observer(() => {
   const { blockchain } = zondConnection;
   const { accountAddress } = activeAccount;
 
+  const isUsingExtension = activeAccountSource === 'extension';
+
+  // Create FormSchema with PIN validation based on isUsingExtension
+  const FormSchema = useMemo(() => z
+    .object({
+      asset: z.string().min(1, "Please select an asset"),
+      receiverAddress: z.string().min(1, "Receiver address is required"),
+      amount: z.coerce.number().gt(0, "Amount should be more than 0"),
+      pin: z.string().optional(),
+    })
+    .superRefine((fields, ctx) => {
+      // Validate address format
+      if (fields.receiverAddress.trim()) {
+        const address = fields.receiverAddress.trim();
+        const isValidZondAddress = address.startsWith('Z') &&
+          (address.length === 41 || address.length === 42);
+        if (!isValidZondAddress) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Invalid Zond address format",
+            path: ["receiverAddress"]
+          });
+        }
+      }
+
+      // Validate PIN for non-extension accounts
+      if (!isUsingExtension) {
+        if (!fields.pin || fields.pin.length < 4 || fields.pin.length > 6) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "PIN must be between 4 to 6 digits",
+            path: ["pin"]
+          });
+        }
+      }
+    }), [isUsingExtension]);
+
   // Get initial asset from URL params (for token transfers from home page)
   const initialAsset = searchParams.get('asset') || 'native';
 
@@ -96,7 +110,6 @@ const Transfer = observer(() => {
   const [amountInputValue, setAmountInputValue] = useState("");
   const [tokenBalance, setTokenBalance] = useState("0");
   const [hasJustCopied, setHasJustCopied] = useState(false);
-  const [isTokenTransferPending, setIsTokenTransferPending] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
@@ -122,7 +135,6 @@ const Transfer = observer(() => {
   const selectedAsset = watch("asset");
   const formValues = watch() as z.infer<typeof FormSchema>;
   const isNativeTransfer = selectedAsset === "native";
-  const isUsingExtension = activeAccountSource === 'extension';
 
   // Get selected token info
   const selectedToken = !isNativeTransfer
@@ -210,7 +222,7 @@ const Transfer = observer(() => {
     }
   };
 
-  async function onSubmit(formData: z.output<typeof FormSchema>) {
+  async function onSubmit(formData: z.infer<typeof FormSchema>) {
     if (isNativeTransfer) {
       await handleNativeTransfer(formData);
     } else {
@@ -218,7 +230,7 @@ const Transfer = observer(() => {
     }
   }
 
-  async function handleNativeTransfer(formData: z.output<typeof FormSchema>) {
+  async function handleNativeTransfer(formData: z.infer<typeof FormSchema>) {
     const valueEther = formData.amount.toString();
 
     if (isUsingExtension) {
@@ -226,11 +238,6 @@ const Transfer = observer(() => {
       resetForm();
       window.scrollTo(0, 0);
     } else {
-      if (!formData.pin || formData.pin.length < 4 || formData.pin.length > 6) {
-        control.setError("pin", { message: "PIN must be between 4 to 6 digits" });
-        return;
-      }
-
       try {
         const encryptedSeed = await StorageUtil.getEncryptedSeed(blockchain, accountAddress);
         if (!encryptedSeed) {
@@ -240,7 +247,7 @@ const Transfer = observer(() => {
 
         let mnemonicPhrases;
         try {
-          const decryptedSeed = WalletEncryptionUtil.decryptSeedWithPin(encryptedSeed, formData.pin);
+          const decryptedSeed = WalletEncryptionUtil.decryptSeedWithPin(encryptedSeed, formData.pin!);
           mnemonicPhrases = decryptedSeed.mnemonic;
         } catch {
           control.setError("pin", { message: "Invalid PIN. Please try again." });
@@ -251,28 +258,18 @@ const Transfer = observer(() => {
         resetForm();
         window.scrollTo(0, 0);
       } catch (error) {
-        control.setError("pin", { message: `Transaction failed: ${error}` });
+        control.setError("pin", { message: `Transaction failed: ${error instanceof Error ? error.message : String(error)}` });
       }
     }
   }
 
-  async function handleTokenTransfer(formData: z.output<typeof FormSchema>) {
+  async function handleTokenTransfer(formData: z.infer<typeof FormSchema>) {
     if (!selectedToken) return;
-
-    if (!isUsingExtension) {
-      if (!formData.pin || formData.pin.length < 4 || formData.pin.length > 6) {
-        control.setError("pin", { message: "PIN must be between 4 to 6 digits" });
-        return;
-      }
-    }
-
-    setIsTokenTransferPending(true);
 
     try {
       const encryptedSeed = await StorageUtil.getEncryptedSeed(blockchain, accountAddress);
       if (!encryptedSeed) {
         control.setError("pin", { message: "No stored seed found. Please import your account again." });
-        setIsTokenTransferPending(false);
         return;
       }
 
@@ -282,33 +279,22 @@ const Transfer = observer(() => {
         mnemonic = decryptedSeed.mnemonic;
       } catch {
         control.setError("pin", { message: "Invalid PIN. Please try again." });
-        setIsTokenTransferPending(false);
         return;
       }
 
       const senderAddress = getAddressFromMnemonic(mnemonic);
       if (senderAddress.toLowerCase() !== accountAddress.toLowerCase()) {
         control.setError("pin", { message: "PIN decrypted an invalid seed." });
-        setIsTokenTransferPending(false);
         return;
       }
 
       const rawAmount = parseUnits(formData.amount.toString(), selectedToken.decimals).toString();
-      const result = await sendTokenToStore(selectedToken, rawAmount, mnemonic, formData.receiverAddress);
-
-      if (result) {
-        toast({ title: "Token sent successfully", description: `Sent ${formData.amount} ${selectedToken.symbol}` });
-        resetForm();
-        zondStore.refreshTokenBalances();
-      } else {
-        toast({ title: "Transfer failed", description: "Please try again", variant: "destructive" });
-      }
+      await sendTokenToStore(selectedToken, rawAmount, mnemonic, formData.receiverAddress);
+      resetForm();
+      window.scrollTo(0, 0);
     } catch (error) {
-      console.error("Token transfer error:", error);
-      toast({ title: "Transfer failed", description: `${error}`, variant: "destructive" });
+      control.setError("pin", { message: `Transfer failed: ${error instanceof Error ? error.message : String(error)}` });
     }
-
-    setIsTokenTransferPending(false);
   }
 
   const resetForm = () => {
@@ -367,7 +353,7 @@ const Transfer = observer(() => {
     );
   }
 
-  if (transactionStatus.state === 'pending' || isTokenTransferPending) {
+  if (transactionStatus.state === 'pending') {
     return (
       <div className="flex w-full items-start justify-center py-8 overflow-x-hidden">
         <div className="relative w-full max-w-2xl px-4">
@@ -552,7 +538,7 @@ const Transfer = observer(() => {
                           <Input
                             {...field}
                             value={field.value ?? ""}
-                            disabled={isSubmitting || isTokenTransferPending}
+                            disabled={isSubmitting}
                             placeholder="Receiver address"
                           />
                         </FormControl>
@@ -582,7 +568,7 @@ const Transfer = observer(() => {
                               placeholder="Enter amount"
                               type="text"
                               inputMode="decimal"
-                              disabled={isSubmitting || isTokenTransferPending}
+                              disabled={isSubmitting}
                               value={amountInputValue}
                               onChange={(e) => {
                                 const value = e.target.value.replace(",", ".");
@@ -613,7 +599,7 @@ const Transfer = observer(() => {
                             step={1}
                             onValueChange={handleSliderChange}
                             className="w-full"
-                            disabled={isSubmitting || isTokenTransferPending}
+                            disabled={isSubmitting}
                           />
 
                           <div className="flex justify-between gap-2">
@@ -624,7 +610,7 @@ const Transfer = observer(() => {
                                 variant="outline"
                                 size="sm"
                                 onClick={setPercentage(pct)}
-                                disabled={isSubmitting || isTokenTransferPending}
+                                disabled={isSubmitting}
                                 className="flex-1"
                               >
                                 {pct === 100 ? "Max" : `${pct}%`}
@@ -651,7 +637,7 @@ const Transfer = observer(() => {
                               length={6}
                               onChange={field.onChange}
                               value={field.value || ''}
-                              disabled={isSubmitting || isTokenTransferPending}
+                              disabled={isSubmitting}
                             />
                           </FormControl>
                           <FormDescription>
@@ -679,10 +665,10 @@ const Transfer = observer(() => {
                     Cancel
                   </Button>
                   <Button
-                    disabled={isSubmitting || isTokenTransferPending || !isValid || (!isUsingExtension && !formValues.pin)}
+                    disabled={isSubmitting || !isValid}
                     type="submit"
                   >
-                    {(isSubmitting || isTokenTransferPending) ? (
+                    {isSubmitting ? (
                       <Loader className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
                       <Send className="mr-2 h-4 w-4" />

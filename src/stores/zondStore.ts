@@ -608,37 +608,78 @@ class ZondStore {
   }
 
   async sendToken(token: TokenInterface, amount: string, mnemonicPhrases: string, toAddress: string) {
-    const confirmationHandler = (data: any) => {
-      console.log(data);
-    }
+    try {
+      const selectedBlockChain = await StorageUtil.getBlockChain();
+      const { url } = ZOND_PROVIDER[selectedBlockChain as keyof typeof ZOND_PROVIDER];
+      const web3 = new Web3(new Web3.providers.HttpProvider(url));
+      const seed = getHexSeedFromMnemonic(mnemonicPhrases);
+      const acc = web3.zond.accounts.seedToAccount(seed)
+      web3.zond.wallet?.add(seed);
+      web3.zond.transactionConfirmationBlocks = 1;
+      const contract = new web3.zond.Contract(CustomERC20ABI, token.address);
+      const tx = contract.methods.transfer(toAddress, amount).encodeABI();
+      const estimateGas = await contract.methods.transfer(toAddress, amount).estimateGas({ "from": acc.address })
+      const txObj = { type: '0x2', gas: estimateGas, from: acc.address, data: tx, to: token.address }
 
-    const receiptHandler = async (data: any) => {
-      console.log(data);
-      // Refresh token balances after successful transaction
-      await this.refreshTokenBalances();
-    }
+      const promiEvent = web3.zond.sendTransaction(txObj, undefined, {
+        checkRevertBeforeSending: true
+      });
 
-    const errorHandler = (data: any) => {
-      console.error(data);
+      promiEvent.on('transactionHash', (hash: string | Uint8Array) => {
+        runInAction(() => {
+          const txHash = typeof hash === 'string' ? hash : utils.bytesToHex(hash);
+          this.transactionStatus = {
+            state: 'pending',
+            txHash: txHash,
+            receipt: null,
+            error: null,
+            pendingDetails: null,
+          };
+          log(`Token transfer pending with hash: ${txHash}`);
+          this.fetchPendingTxDetails(txHash);
+        });
+      }).on('receipt', (receipt: TransactionReceipt) => {
+        runInAction(() => {
+          const txHashString = utils.bytesToHex(receipt.transactionHash);
+          this.transactionStatus = {
+            state: 'confirmed',
+            txHash: txHashString,
+            receipt: receipt,
+            error: null,
+            pendingDetails: null,
+          };
+          log(`Token transfer confirmed: ${txHashString}`);
+          this.refreshTokenBalances();
+          this.fetchAccounts();
+        });
+      }).on('error', (error: Error) => {
+        runInAction(() => {
+          const txHash = this.transactionStatus.txHash;
+          this.transactionStatus = {
+            state: 'failed',
+            txHash: txHash,
+            receipt: null,
+            error: error.message || "Token transfer failed",
+            pendingDetails: null,
+          };
+          log(`Token transfer failed: ${error.message}`);
+        });
+      });
+
+      return true;
+    } catch (error: any) {
+      runInAction(() => {
+        this.transactionStatus = {
+          state: 'failed',
+          txHash: null,
+          receipt: null,
+          error: `Token transfer failed: ${error.message || error}`,
+          pendingDetails: null,
+        };
+        log(`Token transfer preparation failed: ${error}`);
+      });
+      return false;
     }
-    const selectedBlockChain = await StorageUtil.getBlockChain();
-    const { url } = ZOND_PROVIDER[selectedBlockChain as keyof typeof ZOND_PROVIDER];
-    const web3 = new Web3(new Web3.providers.HttpProvider(url));
-    const seed = getHexSeedFromMnemonic(mnemonicPhrases);
-    const acc = web3.zond.accounts.seedToAccount(seed)
-    web3.zond.wallet?.add(seed);
-    web3.zond.transactionConfirmationBlocks = 1;
-    const contract = new web3.zond.Contract(CustomERC20ABI, token.address);
-    const tx = contract.methods.transfer(toAddress, amount).encodeABI();
-    const estimateGas = await contract.methods.transfer(toAddress, amount).estimateGas({ "from": acc.address })
-    const txObj = { type: '0x2', gas: estimateGas, from: acc.address, data: tx, to: token.address }
-    await web3.zond.sendTransaction(txObj, undefined, {
-      checkRevertBeforeSending: true
-    })
-      .on('confirmation', confirmationHandler)
-      .on('receipt', receiptHandler)
-      .on('error', errorHandler)
-    return true;
   }
 
   async createToken(
