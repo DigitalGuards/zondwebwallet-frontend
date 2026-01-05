@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useStore } from "@/stores/store";
 import { useEffect } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/UI/Card";
-import { Check, Copy, ExternalLink, Loader2, Sparkles } from "lucide-react";
+import { Check, Copy, ExternalLink, Loader2, Sparkles, XCircle } from "lucide-react";
 import { StringUtil } from "@/utils/formatting";
 import { utils } from "@theqrl/web3";
 import { BigNumber } from "bignumber.js";
@@ -46,6 +46,11 @@ const TokenStatus = observer(() => {
         addCreatedToken();
     }, [address, addToken, name, symbol, decimals]);
 
+    // Determine which state to show
+    const isCreating = creatingToken.creating;
+    const hasError = !creatingToken.creating && creatingToken.error;
+    const isSuccess = !creatingToken.creating && !creatingToken.error && address;
+
     return (
         <div className="flex w-full items-start justify-center py-8 overflow-x-hidden">
             <div className="relative w-full max-w-2xl px-4">
@@ -54,7 +59,9 @@ const TokenStatus = observer(() => {
                     src="/tree.svg"
                     alt="Background Tree"
                 />
-                {creatingToken.creating ? (
+
+                {/* Creating State */}
+                {isCreating && (
                     <Card className="w-full border-l-4 border-l-orange-500">
                         <CardHeader className="bg-gradient-to-r from-orange-500/10 to-transparent">
                             <CardTitle className="flex items-center gap-2">
@@ -79,7 +86,42 @@ const TokenStatus = observer(() => {
                             </div>
                         </CardContent>
                     </Card>
-                ) : (
+                )}
+
+                {/* Error State */}
+                {hasError && (
+                    <Card className="w-full border-l-4 border-l-destructive">
+                        <CardHeader className="bg-gradient-to-r from-destructive/10 to-transparent">
+                            <CardTitle className="flex items-center gap-2">
+                                <XCircle className="h-5 w-5 text-destructive" />
+                                Token Creation Failed
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="py-8">
+                            <div className="flex flex-col items-center gap-4 text-center">
+                                <div className="rounded-full bg-destructive/10 p-6">
+                                    <XCircle className="h-8 w-8 text-destructive" />
+                                </div>
+                                <div className="space-y-2">
+                                    <p className="text-lg font-medium">Something went wrong</p>
+                                    <p className="text-sm text-muted-foreground max-w-md">
+                                        {creatingToken.error}
+                                    </p>
+                                </div>
+                            </div>
+                        </CardContent>
+                        <CardFooter>
+                            <Link className="w-full" to={ROUTES.CREATE_TOKEN}>
+                                <Button className="w-full" type="button" variant="outline">
+                                    Try Again
+                                </Button>
+                            </Link>
+                        </CardFooter>
+                    </Card>
+                )}
+
+                {/* Success State */}
+                {isSuccess && (
                     <Card className="w-full border-l-4 border-l-green-500">
                         <CardHeader className="bg-gradient-to-r from-green-500/10 to-transparent">
                             <CardTitle className="flex items-center gap-2">

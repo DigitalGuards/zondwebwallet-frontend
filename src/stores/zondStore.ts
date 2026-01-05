@@ -34,6 +34,7 @@ type ZondAccountsType = {
 type CreatingTokenType = {
   name: string;
   creating: boolean;
+  error?: string;
 }
 
 type CreatedTokenType = {
@@ -215,8 +216,8 @@ class ZondStore {
     await this.initializeBlockchain();
   }
 
-  async setCreatingToken(name: string, creating: boolean) {
-    this.creatingToken = { name, creating };
+  async setCreatingToken(name: string, creating: boolean, error?: string) {
+    this.creatingToken = { name, creating, error };
   }
 
   async setCreatedToken(name: string, symbol: string, decimals: number, address: string, tx: string, blockNumber: number, gasUsed: number, effectiveGasPrice: number, blockHash: string) {
@@ -712,7 +713,7 @@ class ZondStore {
 
         if (!tokenCreatedLog?.topics?.[1]) {
           console.error("Token address not found in transaction receipt or logs");
-          this.setCreatingToken("", false);
+          this.setCreatingToken("", false, "Token address not found in transaction receipt");
           return;
         }
         const tokenTopic = tokenCreatedLog.topics[1];
@@ -729,7 +730,7 @@ class ZondStore {
 
       const errorHandler = (error: Error) => {
         console.error("Token creation error:", error);
-        this.setCreatingToken("", false);
+        this.setCreatingToken("", false, error.message || "Transaction failed");
       }
 
       const customERC20Factorycontract = new web3.zond.Contract(customERC20FactoryABI, contractAddress);
@@ -758,7 +759,8 @@ class ZondStore {
         .on('error', errorHandler)
     } catch (error) {
       console.error("Failed to create token:", error);
-      this.setCreatingToken("", false);
+      const errorMessage = error instanceof Error ? error.message : "Token creation failed";
+      this.setCreatingToken("", false, errorMessage);
       throw error;
     }
   }
