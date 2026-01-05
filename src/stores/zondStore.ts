@@ -724,6 +724,7 @@ class ZondStore {
         const blockHash = data.blockHash;
         const { name, symbol, decimals } = await fetchTokenInfo(erc20TokenAddress, url);
         this.setCreatedToken(name, symbol, parseInt(decimals.toString()), erc20TokenAddress, utils.bytesToHex(tx), blockNumber, gasUsed, effectiveGasPrice, utils.bytesToHex(blockHash));
+        this.setCreatingToken("", false);
       }
 
       const errorHandler = (error: Error) => {
