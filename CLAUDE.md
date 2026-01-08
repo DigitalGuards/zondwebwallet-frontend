@@ -1,10 +1,10 @@
-# CLAUDE.md - MyQRL Wallet Frontend
+# CLAUDE.md - MyQRLWallet Frontend
 
 This file provides guidance to Claude Code (claude.ai/code) when working with this repository.
 
 ## Project Overview
 
-**MyQRL Wallet Frontend** is a modern React web wallet for the QRL Zond blockchain.
+**MyQRLWallet Frontend** is a modern React web wallet for the QRL Zond blockchain.
 
 - **URL**: https://qrlwallet.com
 - **Technologies**: Vite 7, React 19, TypeScript, MobX, TailwindCSS 4, Shadcn/ui
@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with th
 
 ## Related Projects
 
-This frontend is part of the MyQRL Wallet ecosystem:
+This frontend is part of the MyQRLWallet ecosystem:
 - **myqrlwallet-backend** - Express.js API (RPC proxy, support email, tx history)
 - **myqrlwallet-app** - React Native/Expo mobile app wrapper
 - **QuantaPool** - Liquid staking protocol
