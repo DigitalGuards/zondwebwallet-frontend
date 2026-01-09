@@ -17,7 +17,9 @@ import {
   confirmWalletCleared,
   notifyWebAppReady,
   dispatchQRResult,
+  sendPinVerified,
 } from '@/utils/nativeApp';
+import { WalletEncryptionUtil } from '@/utils/crypto/walletEncryption';
 import { ROUTES } from '@/router/router';
 import StorageUtil from '@/utils/storage/storage';
 import { ZOND_PROVIDER } from '@/config';
@@ -154,6 +156,47 @@ const NativeAppBridge: React.FC = () => {
           // Native is prompting user to enable biometric - nothing to do in web
           logToNative('Biometric setup prompt shown');
           break;
+
+        case 'VERIFY_PIN': {
+          // Native asks web to verify PIN can decrypt the stored seed
+          const pin = payload?.pin;
+          if (typeof pin !== 'string' || !pin) {
+            console.warn('[Bridge] VERIFY_PIN missing or invalid pin');
+            sendPinVerified(false, 'Invalid PIN format');
+            return;
+          }
+
+          logToNative('Verifying PIN...');
+
+          // Get current blockchain and active account
+          StorageUtil.getBlockChain().then(async (blockchain) => {
+            const activeAccount = await StorageUtil.getActiveAccount(blockchain);
+            if (!activeAccount) {
+              logToNative('No active account found');
+              sendPinVerified(false, 'No active account');
+              return;
+            }
+
+            // Get encrypted seed for the active account
+            const encryptedSeed = await StorageUtil.getEncryptedSeed(blockchain, activeAccount);
+            if (!encryptedSeed) {
+              logToNative('No encrypted seed found');
+              sendPinVerified(false, 'No encrypted seed found');
+              return;
+            }
+
+            // Try to decrypt with the provided PIN
+            try {
+              WalletEncryptionUtil.decryptSeedWithPin(encryptedSeed, pin);
+              logToNative('PIN verified successfully');
+              sendPinVerified(true);
+            } catch {
+              logToNative('PIN verification failed - incorrect PIN');
+              sendPinVerified(false, 'Incorrect PIN');
+            }
+          });
+          break;
+        }
 
         default:
           console.warn('[Bridge] Unknown message type:', type);
