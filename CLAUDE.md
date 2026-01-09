@@ -93,9 +93,9 @@ The web wallet detects when running inside the native app via User-Agent contain
 - `src/components/NativeAppBridge.tsx` - Message listener
 
 ### Key Bridge Messages
-**Web → Native:** `SCAN_QR`, `COPY_TO_CLIPBOARD`, `SHARE`, `OPEN_URL`, `HAPTIC`, `SEED_STORED`, `REQUEST_BIOMETRIC_UNLOCK`, `OPEN_NATIVE_SETTINGS`
+**Web → Native:** `SCAN_QR`, `COPY_TO_CLIPBOARD`, `SHARE`, `OPEN_URL`, `HAPTIC`, `SEED_STORED`, `REQUEST_BIOMETRIC_UNLOCK`, `WALLET_CLEARED`, `PIN_VERIFIED`, `OPEN_NATIVE_SETTINGS`, `WEB_APP_READY`
 
-**Native → Web:** `QR_RESULT`, `UNLOCK_WITH_PIN`, `RESTORE_SEED`, `BIOMETRIC_SETUP_PROMPT`
+**Native → Web:** `QR_RESULT`, `UNLOCK_WITH_PIN`, `RESTORE_SEED`, `CLEAR_WALLET`, `VERIFY_PIN`, `BIOMETRIC_SETUP_PROMPT`
 
 ## Key Features
 
